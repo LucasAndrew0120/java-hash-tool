@@ -2,6 +2,8 @@ package src.main.java;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.awt.Font;
 import javax.swing.Box;
@@ -92,6 +94,19 @@ public class hash
         }
     }
 
+    // 获取时间
+    public static class Time
+    {
+        String strtime1;
+
+        String gettime()
+        {
+            LocalDateTime dt = LocalDateTime.now();
+            strtime1 = dt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return strtime1;
+        }
+    }
+
     // 前端部分
     public static class MyWindow extends JFrame
     {
@@ -142,11 +157,17 @@ public class hash
             jt4.setLineWrap(true);
             jt4.setWrapStyleWord(true);
             jt4.setEditable(false); //设置输出框只读
+            JTextArea jt5 = new JTextArea(); // 日志区
+            jt5.setLineWrap(true);
+            jt5.setWrapStyleWord(true);
+            jt5.setEditable(false); // 设置输出框只读
+
 
             jt1.setFont(new Font("微软雅黑", Font.PLAIN, 16)); // 输入框
             jt2.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 比对框1
             jt3.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 比对框2
             jt4.setFont(new Font("Consolas", Font.BOLD, 14)); // 哈希输出
+            jt5.setFont(new Font("Consolas", Font.BOLD, 14));// 日志输出
 
             JPanel jp1 = new JPanel();  //计算页
             jp1.add(Box.createVerticalStrut(60)); // 空白元素
@@ -164,21 +185,25 @@ public class hash
             jt1.setAlignmentX(CENTER_ALIGNMENT); // 文本框和按钮水平居中
             Calculation.setAlignmentX(CENTER_ALIGNMENT);
 
+            
+
+
             // 计算按钮事件
             Calculation.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
+                    Time time = new Time();
                     textHash.text = jt1.getText(); // 文本输入至后端
                     if (comboBox.getSelectedIndex() == 0)
                     {
                         jt4.setText(textHash.getsha256());
-                        System.out.printf("用户计算了“%s”的SHA-256值，结果是%s\n", textHash.text, textHash.getsha256());
+                        System.out.printf("[%s]用户计算了“%s”的SHA-256值，结果是%s\n",time.gettime(), textHash.text, textHash.getsha256());
                     } 
                     else if (comboBox.getSelectedIndex() == 1)
                     {
                         jt4.setText(textHash.getmd5());
-                        System.out.printf("用户计算了“%s”的MD5值，结果是%s\n", textHash.text, textHash.getmd5());
+                        System.out.printf("[%s]用户计算了“%s”的MD5值，结果是%s\n",time.gettime(), textHash.text, textHash.getmd5());
                     }
                 }
             });
@@ -229,6 +254,7 @@ public class hash
             jt2.setAlignmentX(CENTER_ALIGNMENT);
             Compare.setAlignmentX(CENTER_ALIGNMENT);
 
+            
             jp2.add(jt2);
             jp2.add(Box.createVerticalStrut(10));
             jp2.add(jt3);
@@ -239,6 +265,18 @@ public class hash
             jp2.add(Box.createVerticalStrut(30));
             tabbedPane.setSelectedIndex(0);
             getContentPane().add(tabbedPane);
+
+
+            JPanel jp3 = new JPanel(); // 日志页
+            jp3.add(Box.createVerticalStrut(100));
+
+            jp3.setLayout(new BoxLayout(jp3, BoxLayout.Y_AXIS));
+            jt5.setPreferredSize(new Dimension(100, 200));
+            jt5.setMaximumSize(new Dimension(300, 200));
+            jt5.setMinimumSize(new Dimension(200, 0));
+
+            jp3.add(jt5);
+            tabbedPane.addTab("日志", jp3);
 
             
         }
