@@ -23,6 +23,9 @@ import javax.swing.UIManager;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.awt.event.ActionEvent;
 
 public class hash
@@ -116,8 +119,7 @@ public class hash
         String orgintext;
         String outtext;
 
-        public LogTurnTxt(String hash,String outtime,String orgintext,String outtext)
-        {
+        public LogTurnTxt(String hash, String outtime, String orgintext, String outtext) {
             this.hash = hash;
             this.outtime = outtime;
             this.orgintext = orgintext;
@@ -126,10 +128,36 @@ public class hash
 
         void logouttextarea(JTextArea textArea)
         {
-            String formatted = String.format("[%s]用户计算了 \"%s\" 的 %s 值，结果是 %s \n", this.outtime, this.orgintext, this.hash,
-                    this.outtext);
+            String formatted = String.format("[%s]用户计算了 \"%s\" 的 %s 值，结果是 %s \n", this.outtime, this.orgintext,
+                    this.hash, this.outtext);
             textArea.append(formatted);
             textArea.setCaretPosition(textArea.getDocument().getLength()); // 光标锁定新输出
+        }
+    }
+
+    // 导出日志
+    public static class LogOut 
+    {
+        String logouttext = new String();
+
+        public LogOut(JTextArea jt)
+        {
+            this.logouttext = jt.getText();
+        }
+
+        void logout()
+        {
+            String timestamp = java.time.LocalDateTime.now()  // 生成时间戳
+                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss"));
+            String filename = "哈希日志_" + timestamp + ".txt";
+
+            try (PrintWriter writer = new PrintWriter(new FileWriter(filename)))
+            {
+                writer.print(logouttext);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -142,7 +170,7 @@ public class hash
 
         JButton Calculation; // 计算按钮
         JButton Compare; // 对比按钮
-        JButton logout; //日志导出按钮
+        JButton LogoutButton; //日志导出按钮
         JTabbedPane tabbedPane = new JTabbedPane();
         
 
@@ -170,7 +198,7 @@ public class hash
 
             Calculation = new JButton("计算Hash值");
             Compare = new JButton("比对Hash值");
-            logout = new JButton("导出日志为TXT");
+            LogoutButton = new JButton("导出日志为TXT");
             JTextArea jt1 = new JTextArea(); //文本哈希输入
             jt1.setLineWrap(true); // 自动换行
             jt1.setWrapStyleWord(true);
@@ -218,7 +246,8 @@ public class hash
 
 
             // 计算按钮事件
-            Calculation.addActionListener(new ActionListener() {
+            Calculation.addActionListener(new ActionListener() 
+            {
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
@@ -243,7 +272,8 @@ public class hash
             });
 
             // 比对按钮事件
-            Compare.addActionListener(new ActionListener() {
+            Compare.addActionListener(new ActionListener() 
+            {
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
@@ -260,6 +290,18 @@ public class hash
                         emoji.setText("❌");
                         System.out.println("比对错误");
                     }
+                }
+            });
+
+            // 导出日志按钮事件
+            LogoutButton.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    LogOut logoutString = new LogOut(jt5);
+                    logoutString.logout();
+
                 }
             });
 
@@ -314,13 +356,13 @@ public class hash
             jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
             jt5.setAlignmentX(Component.CENTER_ALIGNMENT);
-            logout.setAlignmentX(Component.CENTER_ALIGNMENT);
+            LogoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
             
             jp3.add(jsp);
             jp3.add(Box.createVerticalStrut(100));
-            jp3.add(logout);
+            jp3.add(LogoutButton);
             jp3.add(Box.createVerticalStrut(50));
             tabbedPane.addTab("日志", jp3);
 
