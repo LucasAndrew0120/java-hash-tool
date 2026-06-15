@@ -13,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -107,14 +108,41 @@ public class hash
         }
     }
 
+    // 日志输出
+    public static class LogTurnTxt
+    {
+        String hash;
+        String outtime;
+        String orgintext;
+        String outtext;
+
+        public LogTurnTxt(String hash,String outtime,String orgintext,String outtext)
+        {
+            this.hash = hash;
+            this.outtime = outtime;
+            this.orgintext = orgintext;
+            this.outtext = outtext;
+        }
+
+        void logouttextarea(JTextArea textArea)
+        {
+            String formatted = String.format("[%s]用户计算了 \"%s\" 的 %s 值，结果是 %s \n", this.outtime, this.orgintext, this.hash,
+                    this.outtext);
+            textArea.append(formatted);
+            textArea.setCaretPosition(textArea.getDocument().getLength()); // 光标锁定新输出
+        }
+    }
+
     // 前端部分
     public static class MyWindow extends JFrame
     {
         TextHash textHash = new TextHash();
         Compare compare = new Compare();
+        
 
         JButton Calculation; // 计算按钮
-        JButton Compare;
+        JButton Compare; // 对比按钮
+        JButton logout; //日志导出按钮
         JTabbedPane tabbedPane = new JTabbedPane();
         
 
@@ -142,6 +170,7 @@ public class hash
 
             Calculation = new JButton("计算Hash值");
             Compare = new JButton("比对Hash值");
+            logout = new JButton("导出日志为TXT");
             JTextArea jt1 = new JTextArea(); //文本哈希输入
             jt1.setLineWrap(true); // 自动换行
             jt1.setWrapStyleWord(true);
@@ -167,7 +196,7 @@ public class hash
             jt2.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 比对框1
             jt3.setFont(new Font("微软雅黑", Font.PLAIN, 14)); // 比对框2
             jt4.setFont(new Font("Consolas", Font.BOLD, 14)); // 哈希输出
-            jt5.setFont(new Font("Consolas", Font.BOLD, 14));// 日志输出
+            jt5.setFont(new Font("微软雅黑", Font.BOLD, 14));// 日志输出
 
             JPanel jp1 = new JPanel();  //计算页
             jp1.add(Box.createVerticalStrut(60)); // 空白元素
@@ -198,12 +227,17 @@ public class hash
                     if (comboBox.getSelectedIndex() == 0)
                     {
                         jt4.setText(textHash.getsha256());
-                        System.out.printf("[%s]用户计算了“%s”的SHA-256值，结果是%s\n",time.gettime(), textHash.text, textHash.getsha256());
+                        LogTurnTxt lt1 = new LogTurnTxt(
+                                (String)comboBox.getSelectedItem(), time.gettime(), textHash.text, textHash.getsha256());
+                        lt1.logouttextarea(jt5);    
+                        
                     } 
                     else if (comboBox.getSelectedIndex() == 1)
                     {
                         jt4.setText(textHash.getmd5());
-                        System.out.printf("[%s]用户计算了“%s”的MD5值，结果是%s\n",time.gettime(), textHash.text, textHash.getmd5());
+                        LogTurnTxt lt1 = new LogTurnTxt((String) comboBox.getSelectedItem(), time.gettime(),
+                                textHash.text, textHash.getmd5());
+                        lt1.logouttextarea(jt5);
                     }
                 }
             });
@@ -268,14 +302,26 @@ public class hash
 
 
             JPanel jp3 = new JPanel(); // 日志页
-            jp3.add(Box.createVerticalStrut(100));
-
             jp3.setLayout(new BoxLayout(jp3, BoxLayout.Y_AXIS));
-            jt5.setPreferredSize(new Dimension(100, 200));
-            jt5.setMaximumSize(new Dimension(300, 200));
-            jt5.setMinimumSize(new Dimension(200, 0));
+            JScrollPane jsp = new JScrollPane(jt5);
 
-            jp3.add(jt5);
+            jsp.setAlignmentX(Component.CENTER_ALIGNMENT);
+            jsp.setPreferredSize(new Dimension(750, 400));
+            jsp.setMinimumSize(new Dimension(600, 300));
+
+            jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  // 设置水平滚动条不需要
+            
+            jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+            jt5.setAlignmentX(Component.CENTER_ALIGNMENT);
+            logout.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+            
+            jp3.add(jsp);
+            jp3.add(Box.createVerticalStrut(100));
+            jp3.add(logout);
+            jp3.add(Box.createVerticalStrut(50));
             tabbedPane.addTab("日志", jp3);
 
             
