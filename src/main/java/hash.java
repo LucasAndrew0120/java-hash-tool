@@ -36,6 +36,7 @@ public class hash
     {
 
         String text;
+        String sha1;
         String sha256;
         String md5;
 
@@ -47,6 +48,22 @@ public class hash
                 sb.append(String.format("%02x", b));
             }
             return sb.toString();
+        }
+
+        public String getsha1()
+        {
+
+            try
+            {
+                MessageDigest md = MessageDigest.getInstance("SHA-1");
+                byte[] hash = md.digest(text.getBytes());
+                sha1 = bytesToHex(hash);
+                return sha1;
+            } catch (NoSuchAlgorithmException e)
+            {
+                System.out.print(e);
+                return null;
+            }
         }
 
         public String getsha256()
@@ -188,6 +205,7 @@ public class hash
             emoji.setMaximumSize(new Dimension(50, 40));
 
             JComboBox<String> comboBox = new JComboBox<>(); // 增加下拉列表
+            comboBox.addItem("SHA-1");
             comboBox.addItem("SHA-256");
             comboBox.addItem("MD5");
 
@@ -255,13 +273,20 @@ public class hash
                     textHash.text = jt1.getText(); // 文本输入至后端
                     if (comboBox.getSelectedIndex() == 0)
                     {
-                        jt4.setText(textHash.getsha256());
+                        jt4.setText(textHash.getsha1());
                         LogTurnTxt lt1 = new LogTurnTxt(
                                 (String)comboBox.getSelectedItem(), time.gettime(), textHash.text, textHash.getsha256());
                         lt1.logouttextarea(jt5);    
                         
                     } 
                     else if (comboBox.getSelectedIndex() == 1)
+                    {
+                        jt4.setText(textHash.getsha256());
+                        LogTurnTxt lt1 = new LogTurnTxt((String) comboBox.getSelectedItem(), time.gettime(),
+                                textHash.text, textHash.getsha256());
+                        lt1.logouttextarea(jt5);
+                    }
+                    else if (comboBox.getSelectedIndex() == 2)
                     {
                         jt4.setText(textHash.getmd5());
                         LogTurnTxt lt1 = new LogTurnTxt((String) comboBox.getSelectedItem(), time.gettime(),
