@@ -1,1 +1,17 @@
-*.txt
+target/
+dist/
+HashTool.zip
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db

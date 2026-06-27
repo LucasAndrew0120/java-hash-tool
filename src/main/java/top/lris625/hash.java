@@ -1,4 +1,4 @@
-package src.main.java;
+package src.main.java.top.lris625;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
